@@ -3,7 +3,6 @@
 /** Middleware for handling req authorization for routes. */
 
 const jwt = require("jsonwebtoken");
-
 const { SECRET_KEY } = require("../config");
 const { UnauthorizedError } = require("../expressError");
 
@@ -38,10 +37,11 @@ function ensureCorrectUser(req, res, next) {
 
 if (!currentUser || hasUnauthorizedUsername){
   throw new UnauthorizedError();
-} 
+}
 
   return next();
 }
+
 
 
 module.exports = {

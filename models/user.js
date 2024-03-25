@@ -32,7 +32,6 @@ class User {
                 phone`,
       [username, hashedPassword, first_name, last_name, phone]
     );
-
     return results.rows[0];
 
   }
