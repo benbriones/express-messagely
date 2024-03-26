@@ -7,17 +7,17 @@ const User = require("../models/user");
 const { SECRET_KEY } = require('../config');
 const { BadRequestError, UnauthorizedError } = require("../expressError");
 
-// TODO: destructure username from req.body, updateLoginTimeStamp
 /** POST /login: {username, password} => {token} */
 router.post("/login", async function (req, res) {
-  const body = req.body;
+  const {username, password} = req.body;
 
   if (!body) {
     throw new BadRequestError("missing login information");
   }
 
-  if (await User.authenticate(body.username, body.password) ) {
-    const token = jwt.sign({ username: body.username }, SECRET_KEY);
+  if (await User.authenticate(username, password) ) {
+    const token = jwt.sign({ username: username }, SECRET_KEY);
+    User.updateLoginTimestamp(username);
     return res.json({ token });
   }
 
@@ -31,7 +31,6 @@ router.post("/login", async function (req, res) {
  *
  * {username, password, first_name, last_name, phone} => {token}.
  */
-// TODO: destructure req.body
 router.post('/register', async function (req, res) {
 
   const body = req.body;

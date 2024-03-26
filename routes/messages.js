@@ -18,7 +18,9 @@ const Message = require("../models/message");
  * Makes sure that the currently-logged-in users is either the to or from user.
  *
  **/
-router.get("/:id", async function (req, res) {
+router.get("/:id",
+  ensureLoggedIn,
+  async function (req, res) {
   const id = req.params.id;
   const message = await Message.get(id);
 
@@ -43,7 +45,9 @@ router.get("/:id", async function (req, res) {
  *
  **/
 
-router.post('/', async function (req, res) {
+router.post('/',
+  ensureLoggedIn,
+  async function (req, res) {
   const { to_username, body } = req.body;
 
   const message = await Message.create({
@@ -64,13 +68,15 @@ router.post('/', async function (req, res) {
  * Makes sure that the only the intended recipient can mark as read.
  *
  **/
-//TODO: extract all info into variables
-router.post('/:id/read', async function (req, res) {
+router.post('/:id/read',
+  ensureLoggedIn,
+  async function (req, res) {
   const id = req.params.id;
+  const username = res.locals.user.username;
 
   const message = await Message.get(id);
 
-  if (message.to_user.username !== res.locals.user.username) {
+  if (message.to_user.username !== username) {
     throw new UnauthorizedError("unauthorized");
   }
 

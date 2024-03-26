@@ -60,7 +60,11 @@ class User {
       RETURNING username, last_login_at`,
       [username]
     );
-            //TODO: Check for potential 404
+
+    if (!results.rows[0]) {
+      throw new NotFoundError(`Cannot find user: ${username}`);
+    }
+
     return results.rows[0];
   }
 
