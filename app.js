@@ -28,7 +28,7 @@ const messageRoutes = require("./routes/messages");
 
 app.use("/auth", authRoutes);
 app.use("/users", ensureLoggedIn, userRoutes);
-app.use("/messages", messageRoutes);
+app.use("/messages", ensureLoggedIn, messageRoutes);
 
 
 /** 404 handler: matches unmatched routes; raises NotFoundError. */

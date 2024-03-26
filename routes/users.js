@@ -4,8 +4,8 @@ const Router = require("express").Router;
 const { ensureCorrectUser } = require("../middleware/auth");
 const User = require('../models/user');
 const router = new Router();
-
-
+// include section in docstring about auth, who can access this route
+// TODO: return object
 /** GET / - get list of users.
  *
  * => {users: [{username, first_name, last_name}, ...]}
