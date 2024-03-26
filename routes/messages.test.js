@@ -50,7 +50,7 @@ describe("Messages Routes Test", function () {
   describe("test GET messages/:id", function () {
 
     test("User should be able to get specfic message", async function () {
-      console.log(`M1ID is: ${m1.id}, m1 is: ${m1}, token1 is: ${token1}`)
+      console.log(`M1ID is: ${m1.id}, m1 is: ${m1}, token1 is: ${token1}`);
       const response = await request(app)
         .get(`/messages/${m1.id}`)
         .query({ _token: token2 });
@@ -81,6 +81,101 @@ describe("Messages Routes Test", function () {
 
     });
 
+    test("User cannot see other people's message", async function () {
+      let u3 = await User.register({
+        username: "test3",
+        password: "password",
+        first_name: "Test3",
+        last_name: "Testy3",
+        phone: "+14155550000",
+      });
+      const token3 = jwt.sign({ username: u3.username }, SECRET_KEY);
+
+      const response = await request(app)
+        .get(`/messages/${m1.id}`)
+        .query({ _token: token3 });
+
+      expect(response.statusCode).toEqual(401);
+      expect(response.body).toEqual({
+        "error": {
+          "message": "unauthorized",
+          "status": 401
+        }
+      });
+    });
+
+  });
+
+  describe("POST /messages", function () {
+    test("Logged in user can create new message", async function () {
+      const response = await request(app)
+        .post('/messages')
+        .send({
+          _token: token1,
+          to_username: "test2",
+          body: "Another test message"
+        });
+
+      expect(response.statusCode).toEqual(201);
+      expect(response.body).toEqual({
+        message: {
+          id: expect.any(Number),
+          from_username: "test1",
+          to_username: "test2",
+          body: "Another test message",
+          sent_at: expect.any(String)
+        }
+      });
+    });
+
+    test("Not logged in user cannot create new message", async function () {
+      const response = await request(app)
+        .post('/messages')
+        .send({
+          _token: "NOT_REAL_TOKEN",
+          to_username: "test2",
+          body: "Another test message"
+        });
+
+      expect(response.statusCode).toEqual(401);
+      expect(response.body).toEqual({
+        "error": {
+          "message": "Unauthorized",
+          "status": 401
+        }
+      });
+    });
+  });
+
+
+  describe("POST /messages/:id/read", function () {
+    test("User can read a message to them", async function () {
+      const response = await request(app)
+        .post(`/messages/${m1.id}/read`)
+        .send({_token: token2});
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({
+        messageRead: {
+          id: m1.id,
+          read_at: expect.any(String)
+        }
+      });
+    });
+
+    test("User cannot read a message not sent to them", async function () {
+      const response = await request(app)
+        .post(`/messages/${m1.id}/read`)
+        .send({_token: token1});
+
+      expect(response.statusCode).toEqual(401);
+      expect(response.body).toEqual({
+        "error": {
+          "message": "unauthorized",
+          "status": 401
+        }
+      });
+    })
   });
 
 });

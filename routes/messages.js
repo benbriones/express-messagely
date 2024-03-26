@@ -60,7 +60,9 @@ router.post('/',
     body
   });
 
-  return res.json({ message });
+  return res
+    .status(201)
+    .json({ message });
 
 });
 
