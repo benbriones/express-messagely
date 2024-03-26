@@ -122,6 +122,99 @@ describe("User Routes Test", function () {
     });
   });
 
+  describe("GET /users/:username/to", function () {
+
+    test("User can get messages to themselves", async function () {
+      const response = await request(app)
+        .get("/users/test2/to")
+        .query({ _token: token2 });
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual(
+        {
+          messages: [
+            {
+              id: expect.any(Number),
+              body: "Test message",
+              sent_at: expect.any(String),
+              read_at: null,
+              from_user: {
+                username: "test1",
+                first_name: "Test1",
+                last_name: "Testy1",
+                phone: "+14155550000"
+              }
+
+            }
+          ]
+        }
+      );
+    });
+
+
+    test("User cannot get messages to another user", async function () {
+      const response = await request(app)
+        .get("/users/test2/to")
+        .query({ _token: token1 });
+      expect(response.statusCode).toEqual(401);
+      expect(response.body).toEqual({
+        "error": {
+          "message": "Unauthorized",
+          "status": 401
+        }
+      }
+      );
+    });
+
+  });
+
+  describe("GET /users/:username/from", function () {
+
+    test("User can get messages from themselves", async function () {
+      const response = await request(app)
+        .get("/users/test1/from")
+        .query({ _token: token1 });
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual(
+        {
+          messages: [
+            {
+              id: expect.any(Number),
+              body: "Test message",
+              sent_at: expect.any(String),
+              read_at: null,
+              to_user: {
+                username: "test2",
+                first_name: "Test2",
+                last_name: "Testy2",
+                phone: "+14155550000"
+              }
+
+            }
+          ]
+        }
+      );
+    });
+
+    test("User cannot get messages from another user not to themselves", async function () {
+      const response = await request(app)
+        .get("/users/test2/from")
+        .query({ _token: token1 });
+      expect(response.statusCode).toEqual(401);
+      expect(response.body).toEqual({
+        "error": {
+          "message": "Unauthorized",
+          "status": 401
+        }
+      }
+      );
+    });
+
+
+
+  });
+
 });
 
 

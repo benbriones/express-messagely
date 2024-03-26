@@ -27,8 +27,12 @@ router.get("/:id",
   const currUrser = res.locals.user.username;
 
 
-  if (message.from_user.username !== currUrser ||
+  if (message.from_user.username !== currUrser &&
     message.to_user.username !== currUrser) {
+
+      console.log("currUser is", currUrser)
+      console.log("fromuser,",message.from_user.username)
+      console.log("touser,",message.to_user.username)
 
     throw new UnauthorizedError("unauthorized");
 

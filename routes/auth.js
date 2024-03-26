@@ -11,7 +11,7 @@ const { BadRequestError, UnauthorizedError } = require("../expressError");
 router.post("/login", async function (req, res) {
   const {username, password} = req.body;
 
-  if (!body) {
+  if (!req.body) {
     throw new BadRequestError("missing login information");
   }
 
